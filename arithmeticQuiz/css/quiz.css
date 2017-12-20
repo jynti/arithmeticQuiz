@@ -1,0 +1,26 @@
+#container{
+  width: 40%;
+  min-height: 200px;
+  margin-right: 10px;
+}
+form{
+ margin-top: 10px;
+ margin-left: 10px;
+ width: 60%;
+ position: relative;
+}
+#question{
+ margin: 20px;
+ display: inline-block;
+}
+#answer{
+  margin: 20px;
+}
+#button{
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+#heading{
+ text-align: center;
+}
