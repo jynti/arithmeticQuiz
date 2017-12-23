@@ -1,4 +1,4 @@
-function QuizCreator(details){
+function QuizCreator(details) {
   this.quizContainer = details.quizContainer;
   this.numOfQuestions = details.numOfQuestions;
   this.rangeX = details.rangeX;
@@ -7,9 +7,11 @@ function QuizCreator(details){
   this.totalPages = [];
   this.score = 0;
   this.count = 0;
+  this.correctScore = 2;
+  this.incorrectScore = 0;
 }
 
-QuizCreator.prototype.init = function(){
+QuizCreator.prototype.init = function() {
   this.createLayout();
   this.createPage();
   this.bindClickToNext();
@@ -17,28 +19,22 @@ QuizCreator.prototype.init = function(){
   this.form.append(this.currentScorePara);
 };
 
-QuizCreator.prototype.createLayout = function(){
-  this.container = $("<div></div>");
-  this.container.attr("id", "container");
-
+QuizCreator.prototype.createLayout = function() {
+  this.container = $("<div></div>").attr("id", "container");
   this.form = $("<form></form>");
 
-  this.question = $("<label></label>");
-  this.question.attr({
+  this.question = $("<label></label>").attr({
     id: "question",
     for: "answer"
   });
-  this.question.text("Hey is this working");
 
-  this.inputAnswer = $("<input>");
-  this.inputAnswer.attr({
+  this.inputAnswer = $("<input>").attr({
     type: "text",
     placeholder: "enter your text",
     id: "answer"
   });
 
-  this.nextButton = $("<input>");
-  this.nextButton.attr({
+  this.nextButton = $("<input>").attr({
     type: "button",
     id: "button",
     value: "Next"
@@ -47,18 +43,11 @@ QuizCreator.prototype.createLayout = function(){
   this.form.append(this.question);
   this.form.append(this.inputAnswer);
   this.form.append(this.nextButton);
-
   this.container.append(this.form);
-
-  this.container.css({
-    float: "left",
-    border: "2px solid black",
-    "margin-top": "20px"
-  });
   this.quizContainer.append(this.container);
 };
 
-QuizCreator.prototype.createPage = function(){
+QuizCreator.prototype.createPage = function() {
   var pageElements = {
     question: this.question,
     inputAnswer: this.inputAnswer
@@ -68,114 +57,80 @@ QuizCreator.prototype.createPage = function(){
     rangeY: this.rangeY,
     operators: this.operators
   }
-  this.page = new Page(pageElements,details);
+  this.page = new PageInQuiz(pageElements, details);
   this.page.init();
 };
 
-QuizCreator.prototype.bindClickToNext = function(){
-  this.nextButton.on("click", $.proxy(function(){
+QuizCreator.prototype.bindClickToNext = function() {
+  this.nextButton.on("click", $.proxy(function() {
 
     this.page.getInputValue();
-
-    var presentScore = "Your score for the previous question is ";
-    if(this.page.userAnswer == this.page.correctAns){
-      presentScore +=  "2";
-      this.score += 2;
-    } else {
-      presentScore += "0";
-      this.totalPages.push(this.page);
-    }
-
-    this.currentScorePara.text(presentScore);
+    this.showScoreForQuestion();
     this.inputAnswer.val("");
 
-    if(++this.count == this.numOfQuestions){
+    if (++this.count == this.numOfQuestions) {
       this.lastPage();
       this.form.remove();
-    } else{
+    } else {
       this.createPage();
     }
   }, this));
 };
 
-QuizCreator.prototype.lastPage = function() {
-  var scorePara = $("<p></p>");
-  scorePara.text("Your total score is " + this.score);
+QuizCreator.prototype.showScoreForQuestion = function() {
+  var presentScoreText = "Your score for the previous question is ";
+  if (this.page.userAnswer == this.page.correctAns) {
+    presentScoreText += this.correctScore;
+    this.score += this.correctScore;
+  } else {
+    presentScoreText += this.incorrectScore;
+    this.totalPages.push(this.page);
+  }
+  this.currentScorePara.text(presentScoreText);
+}
 
+QuizCreator.prototype.lastPage = function() {
+  var _this = this;
+  var scorePara = $("<p></p>").text("Your total score is " + this.score);
   this.container.append(scorePara);
   var wrongAnswersList = $("<ol></ol>");
-  this.totalPages.forEach(function(page, index){
-    var ques = "What is " + page.randomNum1 + " " + page.operator + " " + page.randomNum2 + "?";
-
-    var listItem = $("<li></li>");
-    var divInsideList = $("<div></div>");
-    listItem.append(divInsideList);
-    divInsideList.html("Question: " + ques + "<br>" + "Correct Ans: " +  page.correctAns + "<br>" + "Your answer: " + page.userAnswer + "<br>");
-    wrongAnswersList.append(listItem);
+  this.totalPages.forEach(function(page, index) {
+    _this.incorrectAnsweredListCreator(wrongAnswersList, page);
   });
   this.container.append(wrongAnswersList);
 };
 
-function Page(pageElements, details) {
-  this.question = pageElements.question;
-  this.inputAnswer = pageElements.inputAnswer;
-  this.rangeX = details.rangeX;
-  this.rangeY = details.rangeY;
-  this.operators = details.operators;
+QuizCreator.prototype.incorrectAnsweredListCreator = function(wrongAnswersList, page) {
+  var listItem = $("<li></li>");
+  var divInsideList = $("<div></div>");
+  listItem.append(divInsideList);
+  var ques = "What is " + page.randomNum1 + " " + page.operator + " " + page.randomNum2 + "?";
+  divInsideList.html("Question: " + ques + "<br>" + "Correct Ans: " + page.correctAns + "<br>" + "Your answer: " + page.userAnswer + "<br>");
+  wrongAnswersList.append(listItem);
 }
 
-Page.prototype.init = function() {
-  this.createRandomNumbers();
-  this.calculateCorrectAns();
-  this.createQuestion();
-}
-
-Page.prototype.createRandomNumbers = function() {
-  this.randomNum1 = Math.floor(Math.random() * (this.rangeY - this.rangeX) + this.rangeX);
-  this.randomNum2 = Math.floor(Math.random() * (this.rangeY - this.rangeX) + this.rangeX);
-};
-
-Page.prototype.createRandomOperator = function() {
-  return Math.floor(Math.random()*this.operators.length)
-};
-
-Page.prototype.calculateCorrectAns = function() {
-  var randomOperator = this.createRandomOperator();
-  this.operator = this.operators.join("")[randomOperator];
-  this.correctAns = eval("this.randomNum1" + this.operator  +"this.randomNum2");
-};
-
-Page.prototype.createQuestion = function() {
-  var questionText = "What is " + this.randomNum1 + " " + this.operator + " " + this.randomNum2 + " ?"
-  this.question.text(questionText);
-};
-
-Page.prototype.getInputValue = function() {
-  this.userAnswer = this.inputAnswer.val();
-};
-
-$(document).ready(function(){
-var details = {
-  quizContainer: $("#quizContainer"),
-  rangeX: 20,
-  rangeY: 30,
-  numOfQuestions: 4,
-  operators: ['+', '-', '*', '/'],
-  operatorsX: 1,
-  operatorsY: 3
-}
+$(document).ready(function() {
+  var details = {
+    quizContainer: $("#quizContainer"),
+    rangeX: 20,
+    rangeY: 30,
+    numOfQuestions: 4,
+    operators: ['+', '-', '*', '/'],
+    operatorsX: 1,
+    operatorsY: 3
+  }
   var quizCreator1 = new QuizCreator(details);
   quizCreator1.init();
 
-var details = {
-  quizContainer: $("#quizContainer"),
-  rangeX: 2,
-  rangeY: 5,
-  numOfQuestions: 5,
-  operators: ['+', '-' ],
-  operatorsX: 1,
-  operatorsY: 3
-}
+  var details = {
+    quizContainer: $("#quizContainer"),
+    rangeX: 2,
+    rangeY: 5,
+    numOfQuestions: 5,
+    operators: ['+', '-'],
+    operatorsX: 1,
+    operatorsY: 3
+  }
 
   var quizCreator2 = new QuizCreator(details);
   quizCreator2.init();
