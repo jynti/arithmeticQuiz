@@ -7,7 +7,7 @@ function ArithmeticQuiz(formElements) {
   this.nextButton = formElements.nextButton;
   this.score = 0;
   this.count = 0;
-  this.totalQuestion = 2;
+  this.totalQuestion = 20;
   this.correctScore = 2;
   this.incorrectScore = 0;
 }
