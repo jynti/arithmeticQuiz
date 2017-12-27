@@ -4,17 +4,17 @@
   <title></title>
   <meta charset="UTF-8">
   <link rel="stylesheet" type="text/css" href="css/quiz.css">
-  <script src="javascript/jquery.js"></script>
-  <script src="javascript/quiz.js"></script>
-  <script src="javascript/page_in_quiz.js"></script>
+  <script src="lib/jquery.js"></script>
+  <script src="javascript/arithmetic_quiz.js"></script>
+  <script src="javascript/question.js"></script>
 </head>
 <body>
-  <div id="container">
+  <div id="container" data-type="container">
     <h2 id="heading">Arithmetic Quiz</h2>
-    <form>
-      <label for="answer" id="question"></label><br>
-      <input type="text" placeholder="enter your answer" id="answer"><br>
-      <input type="button" id="button" value="Next">
+    <form data-type="form">
+      <label for="answer" id="question" data-type="question"></label><br>
+      <input type="text" placeholder="enter your answer" id="answer" data-type="answer"><br>
+      <input type="button" id="button" value="Next" data-type="button">
    </form>
   </div>
 </body>
