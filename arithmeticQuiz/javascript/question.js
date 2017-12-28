@@ -34,7 +34,13 @@ Question.prototype.createQuestion = function() {
 };
 
 Question.prototype.calculateCorrectAns = function() {
-  this.correctAns = Math.floor(eval("this.randomNum1" + this.operator  + "this.randomNum2"));
+  var operation = {
+    "+": function(a, b){ return a + b;},
+    "-": function(a, b){ return a - b;},
+    "*": function(a, b){ return a * b;},
+    "/": function(a, b){ return a / b;}
+  };
+  this.correctAns = operation[this.operator](this.randomNum1, this.randomNum2);
 };
 
 Question.prototype.calculateScore = function(){
