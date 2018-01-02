@@ -29,18 +29,25 @@ ArithmeticQuiz.prototype.createQuestion = function() {
 
 ArithmeticQuiz.prototype.bindClickToNext = function() {
   var _this = this;
-  this.nextButton.on("click", function() {
-    var scoreOutput = _this.question.calculateScore();
-    if (++_this.count == _this.totalQuestion) {
-      _this.lastQuestion();
-      _this.form.remove();
-    } else {
-      _this.form.find("p").empty().append(scoreOutput);
-      _this.createQuestion();
-      _this.inputAnswer.val("");
+  this.form.on("submit", function(event) {
+    if (_this.inputAnswer.val().trim() != "") {
+      _this.nextQuestion();
     }
-  });
+    return false;
+  })
 };
+
+ArithmeticQuiz.prototype.nextQuestion = function() {
+  var scoreOutput = this.question.calculateScore();
+  if (++this.count == this.totalQuestion) {
+    this.lastQuestion();
+    this.form.remove();
+  } else {
+    this.form.find("p").empty().append(scoreOutput);
+    this.createQuestion();
+    this.inputAnswer.val("");
+  }
+}
 
 ArithmeticQuiz.prototype.lastQuestion = function() {
   var _this = this;
@@ -72,7 +79,7 @@ $(document).ready(function() {
   };
   var details = {
     operators: ['+', '-', '*', '/'],
-    totalQuestion: 20,
+    totalQuestion: 5,
     correctScore: 2,
     incorrectScore: 0
   };
