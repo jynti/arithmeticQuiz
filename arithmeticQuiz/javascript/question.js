@@ -29,24 +29,36 @@ Question.prototype.createQuestion = function() {
   this.randomNum1 = this.createRandomNumbers();
   this.randomNum2 = this.createRandomNumbers();
   this.operator = this.createRandomOperator();
+  if (this.operator === "/" && this.randomNum2 === 0) {
+    this.createQuestion();
+  }
   var questionText = "What is " + this.randomNum1 + " " + this.operator + " " + this.randomNum2 + " ?";
   this.questionField.text(questionText);
 };
 
 Question.prototype.calculateCorrectAns = function() {
-  var operation = {
-    "+": function(a, b){ return a + b;},
-    "-": function(a, b){ return a - b;},
-    "*": function(a, b){ return a * b;},
-    "/": function(a, b){ return a / b;}
+  var functionality = {
+    "+": function(a, b) {
+      return a + b;
+    },
+    "-": function(a, b) {
+      return a - b;
+    },
+    "*": function(a, b) {
+      return a * b;
+    },
+    "/": function(a, b) {
+      return Math.floor(a / b);
+    }
   };
-  this.correctAns = operation[this.operator](this.randomNum1, this.randomNum2);
+  this.correctAns = functionality[this.operator](this.randomNum1, this.randomNum2);
 };
 
-Question.prototype.calculateScore = function(){
+
+Question.prototype.calculateScore = function() {
   var presentScoreText = "Your score for the previous question is: ";
   this.userAnswer = this.inputAnswer.val();
-  if(this.userAnswer == this.correctAns) {
+  if (this.userAnswer == this.correctAns) {
     presentScoreText += this.correctScore;
     this.quiz.totalScore += this.correctScore;
   } else {
@@ -55,4 +67,3 @@ Question.prototype.calculateScore = function(){
   }
   return presentScoreText;
 }
-
